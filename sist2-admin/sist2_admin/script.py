@@ -31,8 +31,7 @@ def _initialize_git_repository(url, path, log_cb, force_clone, set_pid_cb):
         repo = Repo(path)
         repo.remote("origin").pull()
 
-    setup_script = os.path.join(path, "setup.sh")
-    if setup_script:
+    if setup_script := os.path.join(path, "setup.sh"):
         log_cb({"sist2-admin": f"Executing setup script {setup_script}"})
 
         set_executable(setup_script)

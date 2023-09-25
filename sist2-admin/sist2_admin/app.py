@@ -60,10 +60,10 @@ async def api():
 
 @app.get("/api/job/{name:str}")
 async def get_job(name: str):
-    job = db["jobs"][name]
-    if not job:
+    if job := db["jobs"][name]:
+        return job
+    else:
         raise HTTPException(status_code=404)
-    return job
 
 
 @app.get("/api/frontend/{name:str}")
@@ -228,8 +228,7 @@ async def delete_frontend(name: str):
             pass
         del RUNNING_FRONTENDS[name]
 
-    frontend = db["frontends"][name]
-    if frontend:
+    if frontend := db["frontends"][name]:
         del db["frontends"][name]
     else:
         raise HTTPException(status_code=404)
@@ -326,11 +325,10 @@ def start_frontend_(frontend: Sist2Frontend):
 
 @app.post("/api/frontend/{name:str}/start")
 async def start_frontend(name: str):
-    frontend = db["frontends"][name]
-    if not frontend:
+    if frontend := db["frontends"][name]:
+        start_frontend_(frontend)
+    else:
         raise HTTPException(status_code=404)
-
-    start_frontend_(frontend)
 
 
 @app.post("/api/frontend/{name:str}/stop")
@@ -366,11 +364,10 @@ async def update_search_backend(name: str, backend: Sist2SearchBackend):
 
 @app.get("/api/search_backend/{name:str}")
 def get_search_backend(name: str):
-    backend = db["search_backends"][name]
-    if not backend:
+    if backend := db["search_backends"][name]:
+        return backend
+    else:
         raise HTTPException(status_code=404)
-
-    return backend
 
 
 @app.delete("/api/search_backend/{name:str}")
@@ -440,11 +437,10 @@ async def get_user_scripts():
 
 @app.get("/api/user_script/{name:str}")
 async def get_user_script(name: str):
-    backend = db["user_scripts"][name]
-    if not backend:
+    if backend := db["user_scripts"][name]:
+        return backend
+    else:
         raise HTTPException(status_code=404)
-
-    return backend
 
 
 @app.put("/api/user_script/{name:str}")
@@ -467,8 +463,7 @@ def tail(filepath: str, n: int):
 
         line = ""
         while True:
-            tmp = file.readline()
-            if tmp:
+            if tmp := file.readline():
                 line += tmp
 
                 if line.endswith("\n"):
