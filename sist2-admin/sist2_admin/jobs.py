@@ -166,10 +166,7 @@ class Sist2ScanTask(Sist2Task):
             self.job.previous_index_path = self.job.index_path
             db["jobs"][self.job.name] = self.job
 
-        if is_ok:
-            return 0
-
-        return return_code
+        return 0 if is_ok else return_code
 
 
 class Sist2IndexTask(Sist2Task):
@@ -318,21 +315,14 @@ class TaskQueue:
         self._thread.start()
 
     def _tasks_failed(self):
-        done = set()
-
-        for row in self._db["task_done"].sql("WHERE return_code != 0"):
-            done.add(uuid.UUID(row["id"]))
-
-        return done
+        return {
+            uuid.UUID(row["id"])
+            for row in self._db["task_done"].sql("WHERE return_code != 0")
+        }
 
     def _tasks_done(self):
 
-        done = set()
-
-        for row in self._db["task_done"]:
-            done.add(uuid.UUID(row["id"]))
-
-        return done
+        return {uuid.UUID(row["id"]) for row in self._db["task_done"]}
 
     def _check_new_task(self):
         while True:
@@ -368,9 +358,7 @@ class TaskQueue:
 
     def kill_task(self, task_id):
 
-        task = self._tasks.get(UUID(task_id))
-
-        if task:
+        if task := self._tasks.get(UUID(task_id)):
             pid = task["task"].pid
             logger.info(f"Killing task {task_id} (pid={pid})")
             os.kill(pid, signal.SIGTERM)

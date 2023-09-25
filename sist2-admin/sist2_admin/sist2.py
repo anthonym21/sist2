@@ -73,9 +73,9 @@ class IndexOptions(BaseModel):
                     f"--batch-size={search_backend.batch_size}"]
 
             if search_backend.es_insecure_ssl:
-                args.append(f"--es-insecure-ssl")
+                args.append("--es-insecure-ssl")
             if self.incremental_index:
-                args.append(f"--incremental-index")
+                args.append("--incremental-index")
 
         return args
 
@@ -126,9 +126,9 @@ class ScanOptions(BaseModel):
                 f"--archive={self.archive}", f"--mem-buffer={self.mem_buffer}"]
 
         if self.incremental:
-            args.append(f"--incremental")
+            args.append("--incremental")
         if self.optimize_index:
-            args.append(f"--optimize-index")
+            args.append("--optimize-index")
         if self.rewrite_url:
             args.append(f"--rewrite-url={self.rewrite_url}")
         if self.name:
@@ -138,21 +138,21 @@ class ScanOptions(BaseModel):
         if self.ocr_lang:
             args.append(f"--ocr-lang={self.ocr_lang}")
         if self.ocr_ebooks:
-            args.append(f"--ocr-ebooks")
+            args.append("--ocr-ebooks")
         if self.ocr_images:
-            args.append(f"--ocr-images")
+            args.append("--ocr-images")
         if self.exclude:
             args.append(f"--exclude={self.exclude}")
         if self.fast:
-            args.append(f"--fast")
+            args.append("--fast")
         if self.treemap_threshold:
             args.append(f"--treemap-threshold={self.treemap_threshold}")
         if self.read_subtitles:
-            args.append(f"--read-subtitles")
+            args.append("--read-subtitles")
         if self.fast_epub:
-            args.append(f"--fast-epub")
+            args.append("--fast-epub")
         if self.checksums:
-            args.append(f"--checksums")
+            args.append("--checksums")
         if self.list_file:
             args.append(f"--list_file={self.list_file}")
 
@@ -212,10 +212,14 @@ class WebOptions(BaseModel):
             search_index_absolute = os.path.join(DATA_FOLDER, search_backend.search_index)
             args.append(f"--search-index={search_index_absolute}")
         else:
-            args.append(f"--es-url={search_backend.es_url}")
-            args.append(f"--es-index={search_backend.es_index}")
+            args.extend(
+                (
+                    f"--es-url={search_backend.es_url}",
+                    f"--es-index={search_backend.es_index}",
+                )
+            )
             if search_backend.es_insecure_ssl:
-                args.append(f"--es-insecure-ssl")
+                args.append("--es-insecure-ssl")
 
         if self.auth0_audience:
             args.append(f"--auth0-audience={self.auth0_audience}")
@@ -230,7 +234,7 @@ class WebOptions(BaseModel):
         if self.tag_auth:
             args.append(f"--tag-auth={self.tag_auth}")
         if self.dev:
-            args.append(f"--dev")
+            args.append("--dev")
 
         args.extend(self.indices)
 

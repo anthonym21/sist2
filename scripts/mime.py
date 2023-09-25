@@ -179,7 +179,7 @@ with open("scripts/mime.csv") as f:
     print("char *mime_get_mime_text(unsigned int mime_id) {"
           "switch (mime_id) {")
     for mime, ext in mimes.items():
-        print("case " + clean(mime) + ": return \"" + mime + "\";")
+        print(f"case {clean(mime)}" + ": return \"" + mime + "\";")
     print("default: return NULL;}}")
 
     # Ext -> Enum

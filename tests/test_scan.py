@@ -46,7 +46,7 @@ def get_lmdb_contents(path):
 
     txn = env.begin(write=False)
 
-    return dict((k, v) for k, v in txn.cursor())
+    return dict(txn.cursor())
 
 
 def sist2_incremental_index(files, func=None, incremental_index=False, *args):

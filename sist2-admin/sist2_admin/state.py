@@ -28,30 +28,28 @@ def _serialize(item):
 
 
 def _deserialize(item):
-    if isinstance(item, bytes):
-        return pickle.loads(item)
-    return item
+    return pickle.loads(item) if isinstance(item, bytes) else item
 
 
 class PickleTable(Table):
 
     def __getitem__(self, item):
-        row = super().__getitem__(item)
-        if row:
-            return dict((k, _deserialize(v)) for k, v in row.items())
-        return row
+        if row := super().__getitem__(item):
+            return {k: _deserialize(v) for k, v in row.items()}
+        else:
+            return row
 
     def __setitem__(self, key, value):
-        value = dict((k, _serialize(v)) for k, v in value.items())
+        value = {k: _serialize(v) for k, v in value.items()}
         super().__setitem__(key, value)
 
     def __iter__(self):
         for row in super().__iter__():
-            yield dict((k, _deserialize(v)) for k, v in row.items())
+            yield {k: _deserialize(v) for k, v in row.items()}
 
     def sql(self, where_clause, *params):
         for row in super().sql(where_clause, *params):
-            yield dict((k, _deserialize(v)) for k, v in row.items())
+            yield {k: _deserialize(v) for k, v in row.items()}
 
 
 def get_log_files_to_remove(db: PersistentState, job_name: str, n: int):
@@ -83,7 +81,7 @@ def delete_log_file(db: PersistentState, task_id: str):
 
 
 def migrate_v1_to_v2(db: PersistentState):
-    shutil.copy(db.dbfile, db.dbfile + "-before-migrate-v2.bak")
+    shutil.copy(db.dbfile, f"{db.dbfile}-before-migrate-v2.bak")
 
     # Frontends
     db._table_factory = PickleTable
@@ -119,7 +117,7 @@ def create_default_search_backends(db: PersistentState):
 
 
 def migrate_v3_to_v4(db: PersistentState):
-    shutil.copy(db.dbfile, db.dbfile + "-before-migrate-v4.bak")
+    shutil.copy(db.dbfile, f"{db.dbfile}-before-migrate-v4.bak")
 
     create_default_search_backends(db)
 
